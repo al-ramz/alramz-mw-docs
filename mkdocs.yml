@@ -1,0 +1,62 @@
+site_name: Software AG to Spring Boot Migration Requirement Gathering
+site_url: https://Gaurav9969351313.github.io/alramz-mw-migration-docs
+site_description: Software AG to Spring Boot Migration Documentation
+site_author: Al Ramz
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - toc.integrate
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+  - md_in_html
+
+nav:
+  - Home: index.md
+  - ADRs:
+    - ADR/index.md
+    - 'ADR-0: Requirements': ADR/ADR_0_Requirements.md
+    - 'ADR-1: Secret Management': ADR/ADR_1_Secret_Management.md
+    - 'ADR-2: Azure Compute (Draft)': ADR/ADR_2_Azure_Compute.md
+  - Drafts:
+    - drafts/index.md
+    - 'DFM Onboarding - SRS': drafts/draft_onboarding.md
+    - 'validateIBAN - SRS': drafts/draft_validateIban.md
+    - 'VeriPhone - SRS': drafts/draft_veriphone.md
+    - 'EmailGateway getAuthToken - SRS': drafts/draft_emailgateway_getAuthToken.md
+
+plugins:
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Gaurav9969351313/alramz-mw-migration-docs
