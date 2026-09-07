@@ -52,6 +52,8 @@ nav:
     - 'validateIBAN - SRS': drafts/draft_validateIban.md
     - 'VeriPhone - SRS': drafts/draft_veriphone.md
     - 'EmailGateway getAuthToken - SRS': drafts/draft_emailgateway_getAuthToken.md
+  - Final:
+    - 'DFM Onboarding - API': final/dfmonboarding/DFM_Onboarding_API_Documentation.md
 
 plugins:
   - search
