@@ -53,6 +53,7 @@ nav:
     - 'VeriPhone - SRS': drafts/draft_veriphone.md
     - 'EmailGateway getAuthToken - SRS': drafts/draft_emailgateway_getAuthToken.md
   - Final:
+    - final/index.md
     - 'DFM Onboarding - API': final/dfmonboarding/DFM_Onboarding_API_Documentation.md
 
 plugins:
