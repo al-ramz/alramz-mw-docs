@@ -4,10 +4,9 @@ This section contains draft documents, Software Requirements Specifications (SRS
 
 ## Documents
 
-- [DFM Onboarding - SRS](draft_onboarding.md)
-- [validateIBAN - SRS](draft_validateIban.md)
-- [VeriPhone - SRS](draft_veriphone.md)
-- [EmailGateway getAuthToken - SRS](draft_emailgateway_getAuthToken.md)
+
+- [VeriPhone - SRS](iban/draft_veriphone.md)
+- [Alramz Portal - API](alramzportal/AlRamzPortal-API-Documentation.md)
 
 ## Notes
 

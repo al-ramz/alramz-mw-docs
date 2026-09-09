@@ -4,9 +4,9 @@ This section contains finalized documents and API specifications for the migrati
 
 ## Documents
 
-- [DFM Onboarding - API](dfmonboarding/DFM_Onboarding_API_Documentation.md)
-- [Alramz Portal - API](alramzportal/AlRamzPortal-API-Documentation.md)
+- [DFM Onboarding Journey - APIs](dfmonboarding/DFM_Onboarding_API_Documentation.md)
 
-## Notes test 2
 
-These documents have been reviewed and approved for implementation.
+## Notes
+
+These documents have been reviewed/ready for implementation.
