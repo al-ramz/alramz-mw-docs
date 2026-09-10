@@ -10,9 +10,8 @@
 | --- | --- |
 | Document Title | IBAN Validation Service — API Specification |
 | Service | **Validate IBAN** — `POST /validate` |
-| Migration Target | Spring Boot 3.x / Java 21 |
-| Document Version | 4.0 — `responseCode`/`responseMessage` restored, now mirroring the actual HTTP status code/reason phrase; `errorCode`/`errorMsg` retained but populated only for client-input errors (`IBV001`–`IBV007`), left `null` for backend/provider errors (`IBV008`–`IBV010`). "Request/Response Schema" renamed to "Request/Response Body" throughout. |
-| Prior Version | 3.0 (2026-09-10) — `responseCode`/`responseMessage` removed, `errorCode`/`errorMsg` added top-level for every error. 2.2 — Response Schema fully enumerated as a nested, depth-colored table. 2.1 — `responseMessage` restricted to the standard HTTP reason phrase. 2.0 — target-contract rewrite (camelCase fields, condensed content). 1.0 — full source-analysis edition. See Implementation Notes (Section 6) for legacy defects carried over from v1.0. |
+
+
 
 # Table of Contents
 
