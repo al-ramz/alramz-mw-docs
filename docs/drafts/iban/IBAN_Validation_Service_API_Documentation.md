@@ -11,8 +11,8 @@
 | Document Title | IBAN Validation Service — API Specification |
 | Service | **Validate IBAN** — `POST /validate` |
 | Migration Target | Spring Boot 3.x / Java 21 |
-| Document Version | 2.2 — Response Schema fully enumerates every field (including all `bankData` children) as a nested, depth-colored table instead of dot-notation summary text |
-| Prior Version | 2.1 (2026-09-10) — `responseMessage` restricted to the standard HTTP reason phrase. 2.0 (2026-09-10) — target-contract rewrite (camelCase fields, condensed content). 1.0 (2026-09-09) — full source-analysis edition. See Implementation Notes (Section 6) for legacy defects carried over from v1.0. |
+| Document Version | 4.0 — `responseCode`/`responseMessage` restored, now mirroring the actual HTTP status code/reason phrase; `errorCode`/`errorMsg` retained but populated only for client-input errors (`IBV001`–`IBV007`), left `null` for backend/provider errors (`IBV008`–`IBV010`). "Request/Response Schema" renamed to "Request/Response Body" throughout. |
+| Prior Version | 3.0 (2026-09-10) — `responseCode`/`responseMessage` removed, `errorCode`/`errorMsg` added top-level for every error. 2.2 — Response Schema fully enumerated as a nested, depth-colored table. 2.1 — `responseMessage` restricted to the standard HTTP reason phrase. 2.0 — target-contract rewrite (camelCase fields, condensed content). 1.0 — full source-analysis edition. See Implementation Notes (Section 6) for legacy defects carried over from v1.0. |
 
 # Table of Contents
 
@@ -21,14 +21,18 @@
   - [1.1 Purpose](#11-purpose)
 - [2. API Contract](#2-api-contract)
   - [2.1 Endpoint](#21-endpoint)
-  - [2.2 Request Schema](#22-request-schema)
-  - [2.3 Response Schema](#23-response-schema)
+  - [2.2 Request Body](#22-request-body)
+  - [2.3 Response Body](#23-response-body)
     - [Sample — Success](#sample-success)
-    - [Sample — Validation Error](#sample-validation-error)
+    - [Sample — Client Input Error](#sample-client-input-error)
+    - [Sample — Backend/Provider Error](#sample-backendprovider-error)
+  - [2.4 Response Headers — HTTP Status Codes](#24-response-headers-http-status-codes)
 - [3. Business & Validation Logic](#3-business-validation-logic)
   - [3.1 Validation Rules](#31-validation-rules)
 - [4. External Dependency & Configuration](#4-external-dependency-configuration)
-- [5. Status & Error Code Reference](#5-status-error-code-reference)
+- [5. Error Code Reference](#5-error-code-reference)
+  - [5.1 Client Input Errors — errorCode/errorMsg returned](#51-client-input-errors-errorcodeerrormsg-returned)
+  - [5.2 Backend / Provider Errors — errorCode/errorMsg left null](#52-backend-provider-errors-errorcodeerrormsg-left-null)
 - [6. Implementation Notes](#6-implementation-notes)
 
 # 1. Overview
@@ -37,7 +41,9 @@
 
 A single endpoint, `POST /validate`, that validates a customer-supplied IBAN against a third-party provider and returns the associated bank/branch details. This document specifies the target Spring Boot contract and the business rules the implementation must reproduce — it does not re-document the legacy webMethods internals in full; see the project's v1.0 edition of this doc if that detail is needed.
 
-All request and response field names use **camelCase** (`iban`, `bankData`, `serviceErrorCode`, etc.), regardless of the casing used internally by the legacy system or the external provider.
+All request and response field names use **camelCase** (`iban`, `bankData`, `errorCode`, `errorMsg`, etc.), regardless of the casing used internally by the legacy system or the external provider.
+
+`responseCode` and `responseMessage` always mirror the actual HTTP status code and reason phrase (Section 2.4) — they are a body-level echo of the header, not an independent value. `errorCode` and `errorMsg` carry the specific reason, but **only when the error is caused by the caller's own input** (`IBV001`–`IBV007`); for backend/provider failures (`IBV008`–`IBV010`) both are left `null` in the response, and the specific detail stays server-log-only .
 
 # 2. API Contract
 
@@ -50,7 +56,7 @@ All request and response field names use **camelCase** (`iban`, `bankData`, `ser
 | Content Type | `application/json` |
 | Authentication | Not enforced by the legacy service itself — confirm the gateway/API Manager policy layer in front of this endpoint. |
 
-## 2.2 Request Schema
+## 2.2 Request Body
 
 | **Field** | **Type** | **Required** | **Notes** |
 | --- | --- | --- | --- |
@@ -62,17 +68,21 @@ All request and response field names use **camelCase** (`iban`, `bankData`, `ser
 }
 ```
 
-## 2.3 Response Schema
+## 2.3 Response Body
 
-A single envelope shape is used for both success and error outcomes. Every field is listed below — including every field nested under `response` and under `response.bankData` — rather than summarized in prose. Rows are shaded by **nesting depth**: a field whose Type is **Document** is itself a nested object, and its children are the rows immediately below it at the next depth; every field at the same depth shares the same color, so the color alone shows which fields belong together.
+`responseCode`/`responseMessage` always mirror the real HTTP status/reason phrase (Section 2.4) — they exist in the body purely for convenience so callers don't have to inspect headers. `errorCode`/`errorMsg` carry the specific reason, but **only for client-input errors**; backend/provider errors leave both `null` (Section 5). Every field is listed below, including every field nested under `response.bankData`, rather than summarized in prose. Rows are shaded by **nesting depth**: a field whose Type is **Document** is itself a nested object, and its children are the rows immediately below it at the next depth; every field at the same depth shares the same color.
+
+|  | Depth 0 — top-level fields |  | Depth 1 — children of \`response\` |  | Depth 2 — leaf fields of \`bankData\` (normal style) |
+| --- | --- | --- | --- | --- | --- |
 
 | **Field** | **Type** | **Notes** |
 | --- | --- | --- |
-| `responseCode` | string | Target HTTP-style status as a string (`"200"`, `"400"`, `"422"`, `"502"`, `"503"`). |
-| `responseMessage` | string | The **standard HTTP reason phrase** for `responseCode` only (`"OK"`, `"Bad Request"`, `"Unprocessable Entity"`, `"Bad Gateway"`, `"Service Unavailable"`) — never a business-specific error description. |
-| **`response`** | ***Document*** | Wrapper object holding the domain payload (`bankData`) and the app-level error code (`serviceErrorCode`). Always present; its children are `null` depending on outcome. |
-| `    ↳ serviceErrorCode` | string  | App-level error code (`IBV001`–`IBV010`, Section 5); `null` on success. |
-| `  ↳ `**`bankData`** | ***Document*** | Bank/branch details on success; `null` on any error. Its own fields are listed below. |
+| `responseCode` | string | Mirrors the actual HTTP status code returned in the header, as a string (`"200"`, `"400"`, `"422"`, `"502"`, `"503"`). Always present. |
+| `responseMessage` | string | Mirrors the actual HTTP reason phrase (`"OK"`, `"Bad Request"`, `"Unprocessable Entity"`, `"Bad Gateway"`, `"Service Unavailable"`). Always present. |
+| `errorCode` | string \| null | App-level error code, populated **only for client-input errors** (`IBV001`–`IBV007`, Section 5); `null` on success and `null` on backend/provider errors (`IBV008`–`IBV010`). |
+| `errorMsg` | string \| null | Human-readable, business-specific description of a client-input error only (e.g. "IBAN length is not correct"); `null` on success and `null` on backend/provider errors — that detail stays server-log-only. |
+| **`response`** | ***Document*** | Wrapper object holding the domain payload. Always present; `bankData` is `null` on any error. |
+| `    ↳ `**`bankData`** | ***Document*** | Bank/branch details on success; `null` on any error. Its own fields are listed below. |
 | `        ↳ bic` | string | Bank Identifier Code (SWIFT/BIC). |
 | `        ↳ branch` | string | Branch name. |
 | `        ↳ bank` | string | Bank name. |
@@ -91,16 +101,14 @@ A single envelope shape is used for both success and error outcomes. Every field
 | `        ↳ bankCode` | string | Bank code portion of the IBAN/routing. |
 | `        ↳ branchCode` | string | Branch code portion of the IBAN/routing. May be blank depending on provider/country. |
 
-> **Error detail is logged, not returned:**
->
-> The API response never contains a business-specific error description (e.g. "IBAN length is not correct") — `responseMessage` is always the generic HTTP reason phrase. The specific reason should be written to the application log (keyed by `serviceErrorCode` and a request/correlation ID) so support staff can look it up after the fact; the caller only ever sees `responseCode` + `serviceErrorCode`.
-
 ### Sample — Success
 
 ```json
 {
   "responseCode": "200",
   "responseMessage": "OK",
+  "errorCode": null,
+  "errorMsg": null,
   "response": {
     "bankData": {
       "bic": "BOMLAEAD",
@@ -111,46 +119,74 @@ A single envelope shape is used for both success and error outcomes. Every field
       "countryISO3": "ARE",
       "account": "0331234567890123456",
       "bankCode": "033"
-    },
-    "serviceErrorCode": null
+    }
   }
 }
 ```
 
-### Sample — Validation Error
+### Sample — Client Input Error
 
 ```json
 {
   "responseCode": "400",
   "responseMessage": "Bad Request",
+  "errorCode": "IBV005",
+  "errorMsg": "IBAN length is not correct",
   "response": {
-    "bankData": null,
-    "serviceErrorCode": "IBV005"
+    "bankData": null
   }
 }
 ```
 
-*The caller resolves the specific reason from *`serviceErrorCode`* (Section 5) if needed; the underlying business message ("IBAN length is not correct") is written to the server log, not returned here.*
+*The caller can act on *`errorMsg`* directly, or branch on *`errorCode`* against Section 5's table.*
+
+### Sample — Backend/Provider Error
+
+```json
+{
+  "responseCode": "502",
+  "responseMessage": "Bad Gateway",
+  "errorCode": null,
+  "errorMsg": null,
+  "response": {
+    "bankData": null
+  }
+}
+```
+
+`errorCode`*/*`errorMsg`* stay *`null`* here — the caller only learns "something went wrong upstream" via *`responseCode`*/*`responseMessage`*; the specific reason (e.g. which provider call failed and why) is server-log-only. See the callout above.*
 
 *Sample values are illustrative — no real provider response was available in the source export.*
+
+## 2.4 Response Headers — HTTP Status Codes
+
+`responseCode`/`responseMessage` in the body (Section 2.3) always mirror the values below — implement them by reading the actual status the framework is about to send, not a separately-maintained value, so the two can never drift apart. Every status this service can return:
+
+| **HTTP Status** | **Reason Phrase** | **Meaning** |
+| --- | --- | --- |
+| 200 | OK | Validation succeeded; `response.bankData` is populated, `errorCode`/`errorMsg` are `null`. |
+| 400 | Bad Request | The supplied `iban` failed a client-fixable check (`IBV001`–`IBV005`, `IBV007`, Section 5). |
+| 422 | Unprocessable Entity | The IBAN is well-formed but its country isn't supported by the provider (`IBV006`). |
+| 502 | Bad Gateway | The upstream IBAN provider rejected the request or reported no remaining quota (`IBV008`/`IBV009`). |
+| 503 | Service Unavailable | An unhandled internal exception occurred (`IBV010`). |
 
 # 3. Business & Validation Logic
 
 In order:
 
-- 1. Reject a blank/missing `iban` — return `IBV007` / `400` (the legacy guard for this is dead code; the target must enforce it explicitly).
+- 1. Reject a blank/missing `iban` — client-input error: set `responseCode`/`responseMessage` to `400`/"Bad Request", `errorCode: "IBV007"`, `errorMsg` to the specific reason (the legacy guard for this is dead code; the target must enforce it explicitly).
 - 2. Trim the input, then call the external IBAN provider: `GET {baseUrl}?iban=..&api_key=..&format=json`.
 - 3. Parse the response; resolve `countryISO3` from `countryISO` via a country-code lookup.
-- 4. Run the validation chain below, short-circuiting on the first failing check.
-- 5. If every check passes → `200` / `OK`, `bankData` populated, `serviceErrorCode: null`.
-- 6. If the provider itself reports an error (invalid API key / no quota) → override with `IBV008`/`IBV009` regardless of the chain result above.
-- 7. Any unhandled exception → `IBV010` / `503`.
+- 4. Run the validation chain below, short-circuiting on the first failing check — each failure is client-input, so `errorCode`/`errorMsg` are populated.
+- 5. If every check passes → `responseCode`/`responseMessage`: `200`/"OK", `bankData` populated, `errorCode`/`errorMsg`: `null`.
+- 6. If the provider itself reports an error (invalid API key / no quota) → this is a **backend** error: set `responseCode`/`responseMessage` to `502`/"Bad Gateway", but leave `errorCode`/`errorMsg` `null` — log the specific reason (`IBV008`/`IBV009`, Section 5) internally only, regardless of the chain result above.
+- 7. Any unhandled exception → backend error: `responseCode`/`responseMessage`: `503`/"Service Unavailable", `errorCode`/`errorMsg`: `null`; log `IBV010` internally.
 
 ## 3.1 Validation Rules
 
-Each rule checks a field the provider returns; the "pass" value is provider-defined, not this service's own convention. "On Failure" below shows what's **returned** to the caller (status + `serviceErrorCode`) — the quoted text is the detail to write to the **log only** (see the callout in Section 2.3).
+Each rule checks a field the provider returns; the "pass" value is provider-defined, not this service's own convention. Every row below is a client-input failure, so both `errorCode` and `errorMsg` are populated in the response for each (Section 2.3) — this differs from backend/provider failures (Section 5), which leave `errorCode`/`errorMsg` as `null`.
 
-| **Check** | **Pass Value** | **On Failure (returned)** | **Logged Detail Only** |
+| **Check** | **Pass Value** | **On Failure — errorCode / HTTP Status** | **errorMsg (returned)** |
 | --- | --- | --- | --- |
 | Characters | `006` | `IBV001` / 400 | "IBAN contains illegal characters" |
 | Account check digit | `004` or `002` | `IBV002` / 400 | "Account number check digit not correct" |
@@ -170,31 +206,44 @@ Each rule checks a field the provider returns; the "pass" value is provider-defi
 
 The service has no other runtime dependency (no database). Every request makes a live outbound call to the provider — no caching or fallback exists in the source system.
 
-# 5. Status & Error Code Reference
+# 5. Error Code Reference
 
-The first three columns are what the API actually returns (`responseCode`, `responseMessage`, `response.serviceErrorCode`). The last column is written to the server log only, keyed by `serviceErrorCode` — it is never part of the response body (Section 2.3).
+Every error this service can produce falls into exactly one of two categories, and the category determines whether `errorCode`/`errorMsg` are populated in the body (Section 2.3) or left `null`. `responseCode`/`responseMessage` are always populated in both cases, mirroring the HTTP status (Section 2.4). Success (`200`) is covered in Section 2.4 and not repeated here.
 
-| **HTTP Status** | **responseMessage (returned)** | **serviceErrorCode** | **Logged Detail Only** |
-| --- | --- | --- | --- |
-| 200 | OK | *(null)* | — |
-| 400 | Bad Request | IBV001 | IBAN contains illegal characters |
-| 400 | Bad Request | IBV002 | Account number check digit not correct |
-| 400 | Bad Request | IBV003 | IBAN check digit not correct |
-| 400 | Bad Request | IBV004 | IBAN structure is not correct |
-| 400 | Bad Request | IBV005 | IBAN length is not correct |
-| 422 | Unprocessable Entity | IBV006 | Country does not support the IBAN standard |
-| 400 | Bad Request | IBV007 | IBAN is missing/blank |
-| 502 | Bad Gateway | IBV008 | Provider rejected the configured API key |
-| 502 | Bad Gateway | IBV009 | Provider has no queries/quota remaining |
-| 503 | Service Unavailable | IBV010 | Unhandled exception (generic internal error) |
+## 5.1 Client Input Errors — errorCode/errorMsg returned
+
+Caused by the caller's own IBAN; the specific reason is safe to return since it describes only the submitted input.
+
+| **errorCode** | **responseCode / responseMessage** | **errorMsg (returned)** |
+| --- | --- | --- |
+| IBV001 | 400 / Bad Request | IBAN contains illegal characters |
+| IBV002 | 400 / Bad Request | Account number check digit not correct |
+| IBV003 | 400 / Bad Request | IBAN check digit not correct |
+| IBV004 | 400 / Bad Request | IBAN structure is not correct |
+| IBV005 | 400 / Bad Request | IBAN length is not correct |
+| IBV006 | 422 / Unprocessable Entity | Country does not support the IBAN standard |
+| IBV007 | 400 / Bad Request | IBAN is missing/blank |
+
+## 5.2 Backend / Provider Errors — errorCode/errorMsg left null
+
+Caused by this service's own infrastructure or its upstream provider, not the caller's input — never surfaced via `errorCode`/`errorMsg`; the detail in the last column is written to the server log only, keyed by a correlation/request ID.
+
+| **errorCode (internal)** | **responseCode / responseMessage** | **Logged Detail Only — never returned** |
+| --- | --- | --- |
+| IBV008 | 502 / Bad Gateway | Provider rejected the configured API key |
+| IBV009 | 502 / Bad Gateway | Provider has no queries/quota remaining |
+| IBV010 | 503 / Service Unavailable | Unhandled exception (generic internal error) |
+
+*The "errorCode" column here (*`IBV008`*–*`IBV010`*) is an internal log key only — it is never present in the *`errorCode`* response field, which stays *`null`* for these three.*
 
 # 6. Implementation Notes
 
 Legacy-source gotchas worth knowing so they aren't silently reproduced in the target:
 
-- The legacy `CATCH` block's `503` fallback is set with `OVERWRITE=false` behind a forced-set `1069` default at the top of the flow — in practice this means the generic error fallback never actually fires in the legacy system. Not applicable to the target design above (which always sets `serviceErrorCode`/`responseCode` explicitly per branch), but useful context if reconciling behavior against the legacy service during cutover testing.
+- The legacy `CATCH` block's `503` fallback is set with `OVERWRITE=false` behind a forced-set `1069` default at the top of the flow — in practice this means the generic error fallback never actually fires in the legacy system. Not applicable to the target design above (which always sets `responseCode`/`responseMessage` explicitly per branch), but useful context if reconciling behavior against the legacy service during cutover testing.
 - The legacy "missing IBAN" guard is effectively dead code — all real logic runs unconditionally. The target must add its own explicit `@NotBlank` validation (Section 3, step 1).
 - The legacy system never populates its own `lastError` field on exception — server logs are the only diagnostic trail today. Recommend the target actually log/return exception detail via its `GlobalExceptionHandler`.
 - No authentication is enforced by the legacy Flow itself — confirm the gateway/API Manager layer covers this before go-live.
-- `responseMessage` must stay a fixed HTTP reason phrase — resist the temptation to swap in the business message for "better UX" during implementation; log the business detail instead (Section 2.3, Section 5's "Logged Detail Only" column) so it's still available for support without exposing internal validation logic to callers.
-- Documentation convention (Section 2.3): nested schema fields are shaded by nesting depth, not by row index — a field of Type "Document" is itself a nested object, its children sit at the next depth and share one color, and this depth-based shading is the standard going forward for any nested request/response schema in this programme, not a one-off for IBAN.
+- `responseCode`/`responseMessage` (v4.0) must always be set from the same status value the framework actually returns in the HTTP header — implement them by reading the real status right before responding, not from a separately-maintained field, so the body and the header can never drift apart.
+- `errorCode`/`errorMsg` (v4.0) are populated **only** for the client-input codes `IBV001`–`IBV007` (Section 5.1); for the backend/provider codes `IBV008`–`IBV010` (Section 5.2) both must be left `null` in the response even though the code is still used as an internal log key — take care in the exception-handling/mapping layer not to let the backend codes leak into the same field that serves the client-input codes.
+- Documentation convention (Section 2.3): nested schema fields are shaded by nesting depth, not by row index — a field of Type "Document" is itself a nested object, its children sit at the next depth and share one color, and this depth-based shading is the standard going forward for any nested request/response body table in this programme, not a one-off for IBAN.
