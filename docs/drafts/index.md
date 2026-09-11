@@ -6,7 +6,7 @@ This section contains draft documents, Software Requirements Specifications (SRS
 
 
 - [IBAN API](iban/IBAN_Validation_Service_API_Documentation.md)
-- [VERIPHONE API](iban/IBAN_Validation_Service_API_Documentation.md)
+- [VERIPHONE API](veriphone/VeriPhone-Verify-API-Documentation.md)
 - [Alramz Portal APIs](alramzportal/AlRamzPortal-API-Documentation.md)
 
 ## Notes
