@@ -9,6 +9,7 @@ This section contains draft documents, Software Requirements Specifications (SRS
 - [VERIPHONE API](veriphone/VeriPhone-Verify-API-Documentation.md)
 - [Alramz Portal APIs](alramzportal/AlRamzPortal-API-Documentation.md)
 - [Banking](banking/BankIntegration-CorporateBanking-API-Documentation.md)
+- [Social Media](socialmedia/SocialMedia-API-Documentation.md)
 
 ## Notes
 
