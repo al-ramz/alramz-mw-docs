@@ -37,6 +37,12 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Generate auth config
+        env:
+          DOCS_USERNAME: ${{ secrets.DOCS_USERNAME }}
+          DOCS_PASSWORD: ${{ secrets.DOCS_PASSWORD }}
+        run: python3 scripts/generate_auth_config.py
+
       - name: Build with MkDocs
         run: mkdocs build --site-dir ./_site
 

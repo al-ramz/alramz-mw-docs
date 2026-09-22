@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block extrahead %}
+  {{ super() }}
+  <script>
+    (function () {
+      try {
+        var exp = localStorage.getItem("mwdocs_auth_exp");
+        if (!exp || Date.now() > parseInt(exp, 10)) {
+          document.documentElement.setAttribute("data-auth-locked", "true");
+        }
+      } catch (e) {
+        document.documentElement.setAttribute("data-auth-locked", "true");
+      }
+    })();
+  </script>
+{% endblock %}
+
+{% block header %}
+  {% include "partials/auth-gate.html" %}
+  {{ super() }}
+{% endblock %}

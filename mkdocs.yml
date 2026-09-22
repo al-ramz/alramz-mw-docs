@@ -5,6 +5,7 @@ site_author: Al Ramz
 
 theme:
   name: material
+  custom_dir: overrides
   palette:
     - scheme: default
       primary: indigo
@@ -58,6 +59,13 @@ nav:
 
 plugins:
   - search
+
+extra_css:
+  - assets/auth/auth.css
+
+extra_javascript:
+  - assets/auth/auth-config.js
+  - assets/auth/auth.js
 
 extra:
   social:
