@@ -4,13 +4,14 @@ This section contains draft documents, Software Requirements Specifications (SRS
 
 ## Documents
 
-
 - [IBAN API](iban/IBAN_Validation_Service_API_Documentation.md)
 - [VERIPHONE API](veriphone/VeriPhone-Verify-API-Documentation.md)
 - [Alramz Portal APIs](alramzportal/AlRamzPortal-API-Documentation.md)
 - [Banking](banking/BankIntegration-CorporateBanking-API-Documentation.md)
 - [Social Media](socialmedia/SocialMedia-API-Documentation.md)
 - [DMS](dms/DMSIntegration-API-Documentation.md)
+- [UAE](uaepass/UAEPASS-API-Documentation.md)
+
 
 ## Notes
 
