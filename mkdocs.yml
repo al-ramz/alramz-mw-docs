@@ -5,6 +5,7 @@ site_author: Al Ramz
 
 theme:
   name: material
+  custom_dir: overrides
   palette:
     - scheme: default
       primary: indigo
@@ -46,18 +47,29 @@ nav:
     - 'ADR-0: Requirements': ADR/ADR_0_Requirements.md
     - 'ADR-1: Secret Management': ADR/ADR_1_Secret_Management.md
     - 'ADR-2: Azure Compute (Draft)': ADR/ADR_2_Azure_Compute.md
+    - 'ADR-3: Distributed Caching (Draft)': ADR/ADR_3_Caching_Strategy.md
+    - 'ADR-4: Security Architecture Deferred': ADR/ADR_4_Security_Architecture_Deferred.md
   - Drafts:
     - drafts/index.md
-    - 'DFM Onboarding - SRS': drafts/draft_onboarding.md
-    - 'validateIBAN - SRS': drafts/draft_validateIban.md
-    - 'VeriPhone - SRS': drafts/draft_veriphone.md
-    - 'EmailGateway getAuthToken - SRS': drafts/draft_emailgateway_getAuthToken.md
+    - 'AlRamz Portal - API': drafts/alramzportal/AlRamzPortal-API-Documentation.md
+    - 'DMS Integration - API': drafts/dms/DMSIntegration-API-Documentation.md
+    - 'VeriPhone - API': drafts/veriphone/VeriPhone-Verify-API-Documentation.md
+    - 'IBAN Validation - API': drafts/iban/IBAN_Validation_Service_API_Documentation.md
+    - 'Social Media - API': drafts/socialmedia/SocialMedia-API-Documentation.md
+    - 'Banking - API': drafts/banking/BankIntegration-CorporateBanking-API-Documentation.md
   - Final:
     - final/index.md
     - 'DFM Onboarding - API': final/dfmonboarding/DFM_Onboarding_API_Documentation.md
 
 plugins:
   - search
+
+extra_css:
+  - assets/auth/auth.css
+
+extra_javascript:
+  - assets/auth/auth-config.js
+  - assets/auth/auth.js
 
 extra:
   social:

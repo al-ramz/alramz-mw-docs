@@ -1,0 +1,14 @@
+<div id="mwdocs-auth-gate" role="dialog" aria-modal="true" aria-labelledby="mwdocs-auth-title">
+  <div class="mwdocs-auth-card">
+    <h1 id="mwdocs-auth-title">{{ config.site_name }}</h1>
+    <p class="mwdocs-auth-subtitle">Sign in to view this documentation.</p>
+    <form id="mwdocs-auth-form" autocomplete="off">
+      <label for="mwdocs-auth-user">Username</label>
+      <input id="mwdocs-auth-user" name="username" type="text" autocomplete="username" required>
+      <label for="mwdocs-auth-pass">Password</label>
+      <input id="mwdocs-auth-pass" name="password" type="password" autocomplete="current-password" required>
+      <p id="mwdocs-auth-error" class="mwdocs-auth-error" hidden></p>
+      <button type="submit">Sign in</button>
+    </form>
+  </div>
+</div>

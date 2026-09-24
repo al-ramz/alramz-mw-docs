@@ -1,0 +1,80 @@
+html:not([data-auth-locked="true"]) #mwdocs-auth-gate {
+  display: none;
+}
+
+html[data-auth-locked="true"] body > *:not(#mwdocs-auth-gate) {
+  display: none !important;
+}
+
+#mwdocs-auth-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--md-default-bg-color, #fff);
+  color: var(--md-default-fg-color, #000);
+  font-family: var(--md-text-font, sans-serif);
+  padding: 1rem;
+}
+
+.mwdocs-auth-card {
+  width: 100%;
+  max-width: 360px;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(128, 128, 128, 0.25);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+}
+
+.mwdocs-auth-card h1 {
+  font-size: 1.25rem;
+  margin: 0 0 0.25rem;
+}
+
+.mwdocs-auth-subtitle {
+  margin: 0 0 1.5rem;
+  color: var(--md-default-fg-color--light, #666);
+  font-size: 0.875rem;
+}
+
+#mwdocs-auth-form label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin: 0.75rem 0 0.25rem;
+}
+
+#mwdocs-auth-form input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  border-radius: 0.25rem;
+  font-size: 0.9rem;
+  background: var(--md-default-bg-color, #fff);
+  color: var(--md-default-fg-color, #000);
+}
+
+#mwdocs-auth-form button {
+  margin-top: 1.25rem;
+  width: 100%;
+  padding: 0.6rem;
+  border: none;
+  border-radius: 0.25rem;
+  background: var(--md-primary-fg-color, #3f51b5);
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+#mwdocs-auth-form button:hover {
+  opacity: 0.9;
+}
+
+.mwdocs-auth-error {
+  margin: 0.75rem 0 0;
+  color: #d32f2f;
+  font-size: 0.8rem;
+}

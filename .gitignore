@@ -1,0 +1,15 @@
+# mkdocs build output
+_site/
+site/
+
+# generated at build time from DOCS_USERNAME / DOCS_PASSWORD secrets
+overrides/assets/auth/auth-config.js
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# os
+.DS_Store
