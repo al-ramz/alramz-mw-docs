@@ -11,6 +11,8 @@ This section contains draft documents, Software Requirements Specifications (SRS
 - [Social Media](socialmedia/SocialMedia-API-Documentation.md)
 - [DMS](dms/DMSIntegration-API-Documentation.md)
 - [UAE](uaepass/UAEPASS-API-Documentation.md)
+- [CRM_WASATA_ONBOARDING](crm_wasata/CRM_wasataOnboarding_API_Documentation)
+- [MARKET ONBOARDING](marketOnboarding/Market_Onboarding_API_Documentation.md)
 
 
 ## Notes
