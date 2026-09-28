@@ -13,7 +13,10 @@ This section contains draft documents, Software Requirements Specifications (SRS
 - [UAE](uaepass/UAEPASS-API-Documentation.md)
 - [CRM_WASATA_ONBOARDING](crm_wasata/CRM_wasataOnboarding_API_Documentation)
 - [MARKET ONBOARDING](marketOnboarding/Market_Onboarding_API_Documentation.md)
-- [EIPO](eipo/EIPO-API-Documentation.md)
+- CoreDataProvider
+    - [Engine-Documentation](coreDataProvider/currentEngine/CoreDataProvider-Engine-Documentation.md)
+    - [SpringBoot-Implementation-Guide](coreDataProvider/springBootImplementationGuide/CoreDataProvider-SpringBoot-Implementation-Guide.md)
+
 
 ## Notes
 
