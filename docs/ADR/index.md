@@ -10,6 +10,7 @@ This section contains Architecture Decision Records (ADRs) that document signifi
 - [ADR-3: Distributed Caching (Draft)](ADR_3_Caching_Strategy.md)
 - [ADR-4: Security Architecture Deferred](ADR_4_Security_Architecture_Deferred.md)
 - [ADR-5: Spring Boot to Azure Services Authentication Strategy](ADR_5_Springboot_to_Azure_Services_Authentication_Strategy.md)
+- [ADR-6: Spring Boot Configuration Management with Profiles and Azure Key Vault](ADR_6_Configuration_Management_Strategy.md)
 
 ## What is an ADR?
 
