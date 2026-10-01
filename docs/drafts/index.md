@@ -19,6 +19,7 @@ This section contains draft documents, Software Requirements Specifications (SRS
     - [SpringBoot-Implementation-Guide](coreDataProvider/springBootImplementationGuide/CoreDataProvider-SpringBoot-Implementation-Guide.md)
 - [Currency](currency/README.md)
 - [FIT Integrations](fitIntegrations/README.md)
+- [AUTHENTICATORS](authenticators/Authenticators_API_Documentation.md)
 
 ## Notes
 
