@@ -21,6 +21,7 @@ This section contains draft documents, Software Requirements Specifications (SRS
 - [FIT Integrations](fitIntegrations/README.md)
 - [AUTHENTICATORS](authenticators/Authenticators_API_Documentation.md)
 - [MMFIntegrations](mmfintegration/README.md)
+- [Finoux Integrations](finouxintegrations/README.md)
 ## Notes
 
 These documents are work-in-progress and may be updated as the migration project progresses.
